@@ -12,6 +12,14 @@ Mukodes:
   3. Osszeveti a korabban mar latott talalatokkal (seen-ids.json, amit a
      workflow commitol vissza a repoba minden futas vegen).
   4. Uj talalat eseten emailt kuld (SMTP-beallitasok a GitHub Secrets-bol).
+  5. Minden sikeres lekerdezes utan kiirja a nyers Overpass eredmenyt a
+     latest-elements.json fajlba. A weboldal (Nyiregyhaza-Epitesfigyelo
+     HTML) EZT a fajlt probalja eloszor beolvasni a sajat "Adatok
+     frissitese" gombjaval - igy a felhasznalonak nem kell kozvetlenul
+     a megbizhatatlan Overpass-tukrokre varnia a bongeszojebol, hanem a
+     GitHub Actions altal mar megbizhatoan lekert adatot kapja vissza
+     azonnal. Sikertelen futaskor ezt a fajlt NEM frissitjuk, hogy a
+     weboldal a legutobbi jo adatot lassa tovabbra is.
 """
 import json
 import os
@@ -19,6 +27,7 @@ import re
 import smtplib
 import urllib.request
 import urllib.parse
+from datetime import datetime, timezone
 from email.mime.text import MIMEText
 from pathlib import Path
 
@@ -38,7 +47,18 @@ ENDPOINTS = [
 ]
 
 SEEN_IDS_PATH = Path(__file__).parent / "seen-ids.json"
+LATEST_ELEMENTS_PATH = Path(__file__).parent / "latest-elements.json"
 NAME_PLACEHOLDER_RE = re.compile(r"^(construction|építés|building)$", re.IGNORECASE)
+
+
+def write_latest_elements(payload):
+    out = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "elements": payload.get("elements", []),
+    }
+    LATEST_ELEMENTS_PATH.write_text(
+        json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 def fetch_overpass():
@@ -144,10 +164,28 @@ def send_email(new_items):
 
 
 def main():
+    if os.environ.get("TEST_EMAIL", "false").strip().lower() in ("true", "igen", "1", "yes"):
+        print("Teszt email kerve - probalkozas valodi OSM-lekerdezes nelkul.")
+        test_item = {
+            "id": "osm-way-teszt",
+            "title": "Teszt találat (ez csak egy próba email)",
+            "street": "Teszt utca 1.",
+            "units": 0,
+            "link": "https://www.openstreetmap.org/",
+        }
+        try:
+            send_email([test_item])
+        except Exception as exc:  # noqa: BLE001
+            print(f"Teszt email kuldes hiba: {exc}")
+        return
+
     payload = fetch_overpass()
     if payload is None:
         print("Egyik Overpass-vegpont sem valaszolt ervenyesen ezen a futason - kihagyva.")
         return
+
+    write_latest_elements(payload)
+    print(f"latest-elements.json frissitve ({len(payload.get('elements', []))} nyers elem).")
 
     candidates = extract_candidates(payload)
     seen_ids = set()
