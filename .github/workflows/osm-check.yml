@@ -3,7 +3,12 @@ name: OSM epitesfigyelo ellenorzes
 on:
   schedule:
     - cron: '*/30 * * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: 'Teszt email kuldese (igen/true eseten mindenkepp kuld egy proba levelet)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -26,12 +31,13 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           FROM_ADDRESS: ${{ secrets.FROM_ADDRESS }}
           TO_ADDRESS: ${{ secrets.TO_ADDRESS }}
+          TEST_EMAIL: ${{ inputs.test_email }}
         run: python check_osm.py
 
-      - name: seen-ids.json visszairasa, ha valtozott
+      - name: Eredmenyfajlok visszairasa, ha valtoztak
         run: |
           git config user.name "epitesfigyelo-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add seen-ids.json
-          git diff --cached --quiet || git commit -m "seen-ids.json frissitve"
+          git add seen-ids.json latest-elements.json
+          git diff --cached --quiet || git commit -m "OSM ellenorzes eredmenyeinek frissitese"
           git push
