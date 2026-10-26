@@ -1,0 +1,37 @@
+name: OSM epitesfigyelo ellenorzes
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Overpass-ellenorzes futtatasa
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          FROM_ADDRESS: ${{ secrets.FROM_ADDRESS }}
+          TO_ADDRESS: ${{ secrets.TO_ADDRESS }}
+        run: python check_osm.py
+
+      - name: seen-ids.json visszairasa, ha valtozott
+        run: |
+          git config user.name "epitesfigyelo-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add seen-ids.json
+          git diff --cached --quiet || git commit -m "seen-ids.json frissitve"
+          git push
