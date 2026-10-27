@@ -137,7 +137,7 @@ def send_email(new_items):
     smtp_port = int(os.environ.get("SMTP_PORT") or "587")
     username = os.environ.get("SMTP_USERNAME")
     password = os.environ.get("SMTP_PASSWORD")
-    to_address = os.environ.get("TO_ADDRESS") or "halasz.norbert@giganet.hu"
+    to_address = os.environ.get("TO_ADDRESS") or "magyar.daniel@giganet.hu"
 
     lines = []
     for item in new_items:
