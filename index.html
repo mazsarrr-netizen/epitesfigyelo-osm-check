@@ -98,6 +98,10 @@ h2 { margin: 8px 0; font: 600 clamp(30px, 4.4vw, 46px)/1.08 "Poppins"; letter-sp
 .map-mode { position: absolute; z-index: 30; top: 18px; left: 18px; display: flex; align-items: center; gap: 7px; padding: 9px 11px; color: var(--green); background: rgba(255,255,255,.94); border: 1px solid var(--line); border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 7px 20px rgba(29,33,39,.1); }
 .map-mode span { display: grid; place-items: center; width: 16px; height: 16px; color: var(--white); background: var(--green); border-radius: 50%; font-size: 9px; }
 .network-controls { position:absolute; z-index:30; top:62px; left:18px; display:grid; gap:7px; width:225px; padding:11px 12px; color:var(--ink); background:rgba(255,255,255,.94); border:1px solid var(--line); border-radius:4px; box-shadow:0 7px 20px rgba(29,33,39,.1); font-size:10px; }
+.placement-banner { position:absolute; z-index:40; top:14px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; background:#1D2127; color:#fff; padding:10px 16px; border-radius:6px; font-size:12px; box-shadow:0 7px 20px rgba(0,0,0,.3); white-space:nowrap; }
+.placement-banner strong { color:#FF6A00; }
+.placement-banner button { border:none; background:rgba(255,255,255,.15); color:#fff; padding:5px 12px; border-radius:4px; cursor:pointer; font-weight:700; font-size:11px; }
+#map.placement-active { cursor:crosshair; }
 .network-controls label { display:flex; align-items:center; gap:7px; font-weight:700; }.network-controls input[type="range"] { width:108px; accent-color:var(--green); }.network-controls small { display:flex; align-items:center; flex-wrap:wrap; gap:5px; color:var(--muted); }.line-sample { display:inline-block; width:20px; height:3px; border-radius:2px; }.line-sample.underground { background:#795000; }.line-sample.aerial { background:#164cff; }
 .map-legend { position: absolute; left: 20px; bottom: 20px; z-index: 500; display: flex; gap: 14px; flex-wrap: wrap; padding: 11px 14px; background: rgba(255,255,255,.94); border: 1px solid var(--line); border-radius: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; box-shadow: 0 8px 28px rgba(29,33,39,.12); }
 .map-legend span { display: flex; align-items: center; gap: 6px; }
@@ -139,6 +143,73 @@ h2 { margin: 8px 0; font: 600 clamp(30px, 4.4vw, 46px)/1.08 "Poppins"; letter-sp
 .marker-potential .map-pin, .marker-potential .map-pin:hover, .marker-potential .map-pin.marker-active, .marker-potential .map-pin:focus { color:#1D2127; background:#E0A800; box-shadow:0 0 0 4px rgba(224,168,0,.4), 0 5px 15px rgba(99,82,0,.32); }
 .marker-unknown .map-pin, .marker-unknown .map-pin:hover, .marker-unknown .map-pin.marker-active, .marker-unknown .map-pin:focus { color:#fff; background:#98989A; box-shadow:0 0 0 4px rgba(152,152,154,.28), 0 5px 15px rgba(55,65,61,.32); }
 .coverage-key { width:12px; height:12px; border-radius:50%; display:inline-block; border:3px solid; background:transparent; }.coverage-key.covered { border-color:#519B36; }.coverage-key.blue { border-color:#0A6FA3; }.coverage-key.both { border-color:#519B36; box-shadow:0 0 0 2px #0A6FA3; }.coverage-key.nearby { border-color:#E0A800; background:#E0A800; }.coverage-key.alert { border-color:#B02A2A; background:#B02A2A; }
+.handling-gray .map-pin { background:#8A8A8C; box-shadow:0 4px 16px rgba(29,33,39,.28); animation:none; }
+.handling-green .map-pin { background:var(--green); box-shadow:0 4px 16px rgba(29,33,39,.28); animation:none; }
+.handling-yellow .map-pin { background:var(--amber); box-shadow:0 4px 16px rgba(29,33,39,.28); animation:none; }
+.handling-orange .map-pin { animation: handling-blink 1.1s ease-in-out infinite; }
+@keyframes handling-blink { 0%,100% { background:#9A9A9C; box-shadow:0 0 0 4px rgba(255,106,0,.9), 0 4px 16px rgba(29,33,39,.28); } 50% { background:#FF6A00; box-shadow:0 0 0 12px rgba(255,106,0,.22), 0 4px 16px rgba(29,33,39,.28); } }
+.project-card.handling-gray { opacity:.5; }
+.handling-badge { display:inline-flex; align-items:center; gap:5px; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:20px; margin-left:8px; }
+.handling-badge.gray { background:#E4E4E4; color:#68686A; }
+.handling-badge.green { background:rgba(81,155,54,.15); color:#3C7A28; }
+.handling-badge.yellow { background:rgba(224,168,0,.18); color:#8A6A00; }
+.handling-badge.orange { background:rgba(255,106,0,.2); color:#CC5500; animation: handling-text-blink 1.2s ease-in-out infinite; }
+@keyframes handling-text-blink { 0%,100% { opacity:1; } 50% { opacity:.45; } }
+.reminder-badge { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; color:#9C5209; margin-left:6px; }
+#reminder-banner { display:none; gap:14px; align-items:flex-start; background:#FFF4E5; border-bottom:1px solid #E6A23C; color:#7A4A00; padding:16px max(24px, calc((100vw - 1320px)/2)); font-size:13px; }
+#reminder-banner.visible { display:flex; }
+#reminder-banner strong { display:block; font-size:13px; }
+#reminder-banner ul { margin:6px 0 0; padding-left:18px; }
+#reminder-banner .reminder-banner-actions { margin-left:auto; display:flex; gap:10px; align-items:center; flex-shrink:0; }
+#reminder-banner button { border:none; background:transparent; color:#7A4A00; font-weight:700; cursor:pointer; text-decoration:underline; font-size:12px; }
+.handling-controls { margin-top:18px; padding-top:18px; border-top:1px dashed var(--line); }
+.handling-controls .decision-grid { margin-bottom:10px; }
+#nav-admin-link { opacity:.75; }
+#admin-view { padding:50px max(24px, calc((100vw - 1320px)/2)) 80px; }
+.admin-table-wrap { overflow-x:auto; border:1px solid var(--line); background:var(--white); margin-top:18px; }
+.admin-table { width:100%; border-collapse:collapse; font-size:13px; min-width:1680px; }
+.admin-table th, .admin-table td { min-width:110px; }
+.admin-table th:first-child, .admin-table td:first-child { min-width:170px; }
+.admin-table th { text-align:left; background:var(--paper); padding:10px 12px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); border-bottom:1px solid var(--line); white-space:nowrap; }
+.admin-table td { padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+.admin-table tr:last-child td { border-bottom:none; }
+.admin-table td strong { display:block; font:600 13px "Poppins"; }
+.admin-table td small { color:var(--muted); }
+.admin-table select, .admin-table input[type="date"], .admin-table input[type="text"], .admin-table textarea { width:100%; box-sizing:border-box; padding:7px 9px; border:1px solid var(--line); border-radius:4px; font:12px/1.4 inherit; }
+.admin-table textarea { resize:vertical; min-height:40px; }
+.admin-row-custom { background:#F4FBF1; }
+.admin-delete { border:none; background:#C23B22; color:#fff; padding:7px 10px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:700; white-space:nowrap; }
+.admin-save-hint { font-size:10px; color:var(--green); font-weight:700; opacity:0; transition:opacity .2s; }
+.admin-save-hint.show { opacity:1; }
+.admin-tabs { display:flex; gap:8px; margin-top:28px; border-bottom:1px solid var(--line); }
+.admin-tab { border:none; background:transparent; padding:12px 18px; font:700 13px "Poppins"; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; }
+.admin-tab.active { color:var(--ink); border-bottom-color:var(--green); }
+.admin-panel[hidden] { display:none; }
+.notes-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; margin-top:20px; }
+.note-card { background:var(--white); border:1px solid var(--line); border-radius:6px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.note-card input[type="text"] { font:600 14px "Poppins"; border:none; border-bottom:1px solid var(--line); padding:4px 0; }
+.note-card textarea { border:1px solid var(--line); border-radius:4px; padding:8px; resize:vertical; font:13px/1.5 inherit; }
+.note-card-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.note-card-footer small { color:var(--muted); font-size:10px; }
+.empty-note-hint { color:var(--muted); margin-top:20px; }
+.company-note { margin-top:10px; font-size:12px; background:#FFF8E6; padding:8px 10px; border-radius:4px; }
+.company-notes-list { margin-top:10px; font-size:12px; background:#FFF8E6; padding:8px 10px; border-radius:4px; }
+.company-notes-list b { display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+.company-notes-list ul { margin:0; padding-left:16px; }
+.company-notes-list li { margin-bottom:3px; }
+.company-notes-list small { color:var(--muted); }
+.own-notes-list { margin:0 0 16px; padding-left:18px; }
+.own-notes-list li { margin-bottom:6px; }
+.own-notes-list small { color:var(--muted); }
+.notes-cell { min-width:220px; }
+.notes-cell-list { display:flex; flex-direction:column; gap:4px; margin-bottom:6px; max-height:120px; overflow-y:auto; }
+.notes-cell-item { display:flex; align-items:flex-start; justify-content:space-between; gap:6px; background:var(--paper); border-radius:4px; padding:5px 7px; font-size:11.5px; }
+.notes-cell-item span { flex:1; word-break:break-word; }
+.notes-cell-delete { border:none; background:transparent; color:#B02A2A; font-weight:700; cursor:pointer; font-size:13px; line-height:1; padding:0 2px; }
+.notes-cell-empty { color:var(--muted); }
+.notes-cell-add { display:flex; gap:4px; }
+.notes-cell-add input { flex:1; }
+.notes-cell-add-btn { border:none; background:var(--green); color:#fff; border-radius:4px; padding:0 10px; cursor:pointer; font-weight:700; }
 .giganet-workbench { padding:70px max(24px, calc((100vw - 1320px)/2)); background:#E8F5E1; border-bottom:1px solid var(--line); }
 .giganet-workbench h2 { margin:8px 0 10px; font:600 clamp(26px,3.6vw,40px)/1.1 "Poppins"; color: var(--ink); }
 .workbench-actions { display:flex; gap:10px; flex-wrap:wrap; }
@@ -238,11 +309,13 @@ dialog::backdrop { background: rgba(29,33,39,.72); backdrop-filter: blur(4px); }
       <a href="#giganet">Giganet</a>
       <a href="#forrasok">Források</a>
       <a href="#modszer">Módszertan</a>
+      <a href="#admin" id="nav-admin-link">Admin</a>
       <a class="nav-cta" href="#modszer">Adatok és módszertan</a>
     </nav>
   </header>
 
   <main>
+    <div id="public-view">
     <section class="hero">
       <div class="eyebrow"><span class="pulse"></span> Városi projektfigyelő · 2026</div>
       <h1>Lásd, hol épül<br><em>Nyíregyháza.</em></h1>
@@ -259,6 +332,17 @@ dialog::backdrop { background: rgba(29,33,39,.72); backdrop-filter: blur(4px); }
       </div>
       <div class="hero-grid" aria-hidden="true"></div>
     </section>
+
+    <div id="reminder-banner" role="status" aria-live="polite">
+      <div>
+        <strong>Esedékes emlékeztetők</strong>
+        <ul id="reminder-list"></ul>
+      </div>
+      <div class="reminder-banner-actions">
+        <button id="enable-notifications" type="button" hidden>Böngésző-értesítés engedélyezése</button>
+        <button id="dismiss-reminders" type="button">Bezárás</button>
+      </div>
+    </div>
 
     <section class="giganet-workbench" id="giganet">
       <div class="section-head">
@@ -347,6 +431,10 @@ dialog::backdrop { background: rgba(29,33,39,.72); backdrop-filter: blur(4px); }
       <div class="explorer">
         <div class="map-wrap">
           <div id="map" role="group" aria-label="Nyíregyháza építkezéseinek interaktív térképe"></div>
+          <div class="placement-banner" id="placement-banner" hidden>
+            <span>Kattints a térképre az új helyhez ehhez: <strong id="placement-banner-title"></strong></span>
+            <button type="button" id="placement-cancel">Mégse</button>
+          </div>
           <div class="network-controls" aria-label="Hálózati térképréteg beállításai">
             <label><input id="network-layer-toggle" type="checkbox" checked> Giganet-hálózat mutatása</label>
             <label>Erősség <input id="network-layer-opacity" type="range" min="0.25" max="1" step="0.05" value="0.95"></label>
@@ -417,6 +505,107 @@ dialog::backdrop { background: rgba(29,33,39,.72); backdrop-filter: blur(4px); }
       <strong>Fontos tudnivaló</strong>
       <p>Az oldal tájékoztató jellegű, nyilvános források alapján készült. A „meghirdetett” státusz nem igazolja önmagában a kivitelezés tényleges megkezdését. Vásárlási vagy jogi döntés előtt ellenőrizd az adatokat a beruházónál és az illetékes hatóságnál.</p>
     </section>
+    </div>
+
+    <div id="admin-view" hidden>
+      <section class="admin-section">
+        <div class="section-head">
+          <div>
+            <span class="section-number">ADMIN</span>
+            <h2>Saját admin felület</h2>
+            <p>Itt módosíthatsz, írhatsz felül vagy vehetsz fel bármit saját magadnak: projekteket, vállalkozókat, és szabad jegyzeteket is. Minden adat csak ebben a böngészőben, ezen a gépen marad meg.</p>
+          </div>
+          <div class="update-actions">
+            <a class="button dark" href="#projektek" id="admin-back-link">Vissza a térképhez</a>
+          </div>
+        </div>
+
+        <div class="admin-tabs" role="tablist">
+          <button type="button" class="admin-tab active" data-admin-tab="projects">Projektek</button>
+          <button type="button" class="admin-tab" data-admin-tab="companies">Vállalkozók</button>
+          <button type="button" class="admin-tab" data-admin-tab="notes">Megjegyzés</button>
+        </div>
+
+        <div id="admin-panel-projects" class="admin-panel">
+          <div class="filters" role="search">
+            <label class="searchbox">
+              <span aria-hidden="true">⌕</span>
+              <input id="admin-search" type="search" placeholder="Utca vagy projekt keresése…" autocomplete="off">
+            </label>
+            <select id="admin-status-filter" aria-label="Kezelési állapot szűrése">
+              <option value="all">Minden kezelési állapot</option>
+              <option value="orange">Narancs · még nem kezelt</option>
+              <option value="green">Zöld · foglalkoztatott</option>
+              <option value="yellow">Sárga · kérdéses</option>
+              <option value="gray">Szürke · nem releváns</option>
+            </select>
+            <button class="refresh-button" id="admin-add-new" type="button">+ Új saját projekt</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Eredeti adat</th>
+                  <th>Projekt neve</th>
+                  <th>Cím</th>
+                  <th>Városrész</th>
+                  <th>Típus</th>
+                  <th>Lakásegység</th>
+                  <th>Kezelési állapot</th>
+                  <th>Emlékeztető dátum</th>
+                  <th>Emlékeztető megjegyzés</th>
+                  <th>Saját megjegyzés</th>
+                  <th>Jegyzetek</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-panel-companies" class="admin-panel" hidden>
+          <div class="filters" role="search">
+            <label class="searchbox">
+              <span aria-hidden="true">⌕</span>
+              <input id="admin-company-search" type="search" placeholder="Vállalkozó keresése…" autocomplete="off">
+            </label>
+            <button class="refresh-button" id="admin-add-company" type="button">+ Új vállalkozó</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Eredeti név</th>
+                  <th>Név</th>
+                  <th>Szerepkör</th>
+                  <th>Cím</th>
+                  <th>Telefon</th>
+                  <th>E-mail</th>
+                  <th>Weboldal</th>
+                  <th>Jegyzetek</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="admin-company-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-panel-notes" class="admin-panel" hidden>
+          <div class="section-head">
+            <div>
+              <h2>Saját jegyzetek</h2>
+              <p>Szabad szöveges jegyzetek, amik semmilyen projekthez vagy céghez nincsenek kötve — csak a tiéd, csak ebben a böngészőben.</p>
+            </div>
+            <div class="update-actions">
+              <button class="refresh-button" id="admin-add-note" type="button">+ Új jegyzet</button>
+            </div>
+          </div>
+          <div id="admin-notes-list" class="notes-list"></div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer>
@@ -1273,6 +1462,20 @@ const dialogContent = document.querySelector("#dialog-content");
 const coverageDialog = document.querySelector("#coverage-dialog");
 const customAddDialog = document.querySelector("#custom-add-dialog");
 let pendingCustomLngLat = null;
+let placingProject = null;
+function startPlacement(project) {
+  placingProject = project;
+  document.querySelector("#placement-banner-title").textContent = project.title;
+  document.querySelector("#placement-banner").hidden = false;
+  document.querySelector("#map").classList.add("placement-active");
+  dialog.close();
+}
+function cancelPlacement() {
+  placingProject = null;
+  document.querySelector("#placement-banner").hidden = true;
+  document.querySelector("#map").classList.remove("placement-active");
+}
+document.querySelector("#placement-cancel").addEventListener("click", cancelPlacement);
 
 const DECISION_KEY = "nyh-epitesfigyelo-giganet-v4-szigoru-250m";
 let decisions = {};
@@ -1282,6 +1485,127 @@ const CUSTOM_KEY = "nyh-epitesfigyelo-sajat-projektek-v1";
 let customProjects = [];
 try { customProjects = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); } catch { customProjects = []; }
 function saveCustomProjects() { localStorage.setItem(CUSTOM_KEY, JSON.stringify(customProjects)); }
+
+const FLAG_KEY = "nyh-epitesfigyelo-kezeles-v1";
+let flags = {};
+try { flags = JSON.parse(localStorage.getItem(FLAG_KEY) || "{}"); } catch { flags = {}; }
+function saveFlags() { localStorage.setItem(FLAG_KEY, JSON.stringify(flags)); }
+function getHandling(project) {
+  return flags[project.id] || { status: "orange", reminderDate: "", reminderNote: "", manualNote: "", extraNotes: [] };
+}
+function saveHandling(id, patch) {
+  flags[id] = { ...getHandling({ id }), ...patch };
+  saveFlags();
+}
+const HANDLING_LABEL = { gray: "Nem releváns", green: "Foglalkoztatott", yellow: "Kérdéses", orange: "Még nem kezelt" };
+function getEffectiveProject(project) {
+  if (project.custom) return { ...project, extraNotes: project.extraNotes || [] };
+  const handling = getHandling(project);
+  return {
+    ...project,
+    title: handling.overrideTitle || project.title,
+    street: handling.overrideStreet || project.street,
+    district: handling.overrideDistrict || project.district,
+    typeLabel: handling.overrideTypeLabel || project.typeLabel,
+    units: handling.overrideUnits !== undefined && handling.overrideUnits !== null && handling.overrideUnits !== "" ? Number(handling.overrideUnits) : project.units,
+    lat: handling.overrideLat !== undefined && handling.overrideLat !== null && handling.overrideLat !== "" ? Number(handling.overrideLat) : project.lat,
+    lng: handling.overrideLng !== undefined && handling.overrideLng !== null && handling.overrideLng !== "" ? Number(handling.overrideLng) : project.lng,
+    extraNotes: handling.extraNotes || []
+  };
+}
+function addProjectNote(project, text) {
+  if (!text) return;
+  const entry = { id: `note-${Date.now()}`, text, created: new Date().toLocaleString("hu-HU") };
+  if (project.custom) {
+    project.extraNotes = [...(project.extraNotes || []), entry];
+    saveCustomProjects();
+  } else {
+    const handling = getHandling(project);
+    saveHandling(project.id, { extraNotes: [...(handling.extraNotes || []), entry] });
+  }
+}
+function deleteProjectNote(project, noteId) {
+  if (project.custom) {
+    project.extraNotes = (project.extraNotes || []).filter(note => note.id !== noteId);
+    saveCustomProjects();
+  } else {
+    const handling = getHandling(project);
+    saveHandling(project.id, { extraNotes: (handling.extraNotes || []).filter(note => note.id !== noteId) });
+  }
+}
+
+const COMPANY_FLAG_KEY = "nyh-epitesfigyelo-cegek-v1";
+let companyFlags = {};
+try { companyFlags = JSON.parse(localStorage.getItem(COMPANY_FLAG_KEY) || "{}"); } catch { companyFlags = {}; }
+function saveCompanyFlags() { localStorage.setItem(COMPANY_FLAG_KEY, JSON.stringify(companyFlags)); }
+
+const CUSTOM_COMPANY_KEY = "nyh-epitesfigyelo-sajat-cegek-v1";
+let customCompanies = [];
+try { customCompanies = JSON.parse(localStorage.getItem(CUSTOM_COMPANY_KEY) || "[]"); } catch { customCompanies = []; }
+function saveCustomCompanies() { localStorage.setItem(CUSTOM_COMPANY_KEY, JSON.stringify(customCompanies)); }
+
+function getEffectiveCompany(company, idx) {
+  const override = companyFlags[idx] || {};
+  return {
+    ...company,
+    name: override.name || company.name,
+    role: override.role || company.role,
+    address: override.address || company.address,
+    phone: override.phone || company.phone,
+    email: override.email || company.email,
+    url: override.url || company.url,
+    extraNotes: override.extraNotes || []
+  };
+}
+function addCompanyNote(company, idx, custom, text) {
+  if (!text) return;
+  const entry = { id: `note-${Date.now()}`, text, created: new Date().toLocaleString("hu-HU") };
+  if (custom) {
+    company.extraNotes = [...(company.extraNotes || []), entry];
+    saveCustomCompanies();
+  } else {
+    const override = companyFlags[idx] || {};
+    companyFlags[idx] = { ...override, extraNotes: [...(override.extraNotes || []), entry] };
+    saveCompanyFlags();
+  }
+}
+function deleteCompanyNote(company, idx, custom, noteId) {
+  if (custom) {
+    company.extraNotes = (company.extraNotes || []).filter(note => note.id !== noteId);
+    saveCustomCompanies();
+  } else {
+    const override = companyFlags[idx] || {};
+    companyFlags[idx] = { ...override, extraNotes: (override.extraNotes || []).filter(note => note.id !== noteId) };
+    saveCompanyFlags();
+  }
+}
+
+const NOTES_KEY = "nyh-epitesfigyelo-sajat-jegyzetek-v1";
+let notes = [];
+try { notes = JSON.parse(localStorage.getItem(NOTES_KEY) || "[]"); } catch { notes = []; }
+function saveNotes() { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); }
+
+function checkReminders() {
+  const banner = document.querySelector("#reminder-banner");
+  const list = document.querySelector("#reminder-list");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = [...projects, ...customProjects]
+    .map(project => ({ project, handling: getHandling(project) }))
+    .filter(({ handling }) => handling.reminderDate && new Date(`${handling.reminderDate}T00:00:00`) <= today);
+  if (!due.length) {
+    banner.classList.remove("visible");
+    list.innerHTML = "";
+    return;
+  }
+  list.innerHTML = due.map(({ project, handling }) => `<li><strong>${escapeHTML(project.title)}</strong> — ${escapeHTML(project.street)}${handling.reminderNote ? ` · ${escapeHTML(handling.reminderNote)}` : ""} <small>(${escapeHTML(handling.reminderDate)})</small></li>`).join("");
+  banner.classList.add("visible");
+  if (window.Notification && Notification.permission === "granted") {
+    due.forEach(({ project, handling }) => {
+      try { new Notification(`Emlékeztető: ${project.title}`, { body: handling.reminderNote || project.street }); } catch {}
+    });
+  }
+}
 
 const RELEVANCE = {
   lead: { label: "Giganet-lehetőség", className: "lead" },
@@ -1427,11 +1751,14 @@ function saveDecision(projectId, patch) {
 }
 
 function renderCompanies() {
-  document.querySelector("#company-grid").innerHTML = COMPANY_CATALOG.map(company => ({
+  const catalogItems = COMPANY_CATALOG.map((company, idx) => ({
     company,
+    display: getEffectiveCompany(company, idx),
     linked: projects.filter(project => company.match.test(`${project.source} ${project.sourceName} ${project.title}`)).length
-  })).filter(item => item.linked > 0 || (item.company.contacts && item.company.contacts.length > 0)).map(({ company, linked }) => {
-    const phoneHref = company.phone ? company.phone.replace(/[^+\d]/g, "") : "";
+  })).filter(item => item.linked > 0 || (item.company.contacts && item.company.contacts.length > 0) || item.display.extraNotes.length > 0);
+  const customItems = customCompanies.map(company => ({ company, display: company, linked: 0 }));
+  document.querySelector("#company-grid").innerHTML = [...catalogItems, ...customItems].map(({ company, display, linked }) => {
+    const phoneHref = display.phone ? display.phone.replace(/[^+\d]/g, "") : "";
     const contactsBlock = (company.contacts && company.contacts.length) ? `<div class="company-people">
         <b>Kapcsolattartók</b>
         ${company.contacts.map(person => {
@@ -1440,15 +1767,16 @@ function renderCompanies() {
         }).join("")}
       </div>` : "";
     return `<article class="company-card">
-      <small>${company.role}</small><h3>${company.name}</h3><p>${company.description}</p>
+      <small>${escapeHTML(display.role || "")}</small><h3>${escapeHTML(display.name)}</h3><p>${escapeHTML(company.description || "")}</p>
       <div class="company-contact">
-        <span><b>Cím</b>${company.address}</span>
-        ${company.phone ? `<a href="tel:${phoneHref}"><b>Telefon</b>${company.phone}</a>` : ""}
-        ${company.email ? `<a href="mailto:${company.email}"><b>E-mail</b>${company.email}</a>` : ""}
+        <span><b>Cím</b>${escapeHTML(display.address || "")}</span>
+        ${display.phone ? `<a href="tel:${phoneHref}"><b>Telefon</b>${escapeHTML(display.phone)}</a>` : ""}
+        ${display.email ? `<a href="mailto:${escapeHTML(display.email)}"><b>E-mail</b>${escapeHTML(display.email)}</a>` : ""}
       </div>
       ${contactsBlock}
-      ${company.url ? `<a class="company-source" href="${company.url}" target="_blank" rel="noopener">Céges/projektforrás megnyitása ↗</a>` : ""}
-      <div class="source-health ${linked > 0 ? "ok" : ""}"><i></i>${linked} kapcsolt projekt</div>
+      ${(display.extraNotes || []).length ? `<div class="company-notes-list"><b>Saját jegyzetek</b><ul>${display.extraNotes.map(note => `<li>${escapeHTML(note.text)} <small>(${escapeHTML(note.created)})</small></li>`).join("")}</ul></div>` : ""}
+      ${display.url ? `<a class="company-source" href="${escapeHTML(display.url)}" target="_blank" rel="noopener">Céges/projektforrás megnyitása ↗</a>` : ""}
+      <div class="source-health ${linked > 0 ? "ok" : ""}"><i></i>${company.custom ? "Saját bejegyzés" : `${linked} kapcsolt projekt`}</div>
     </article>`;
   }).join("");
 }
@@ -1498,6 +1826,19 @@ if (window.maplibregl) {
     document.querySelector("#custom-add-result").textContent = "";
     document.querySelector("#custom-add-coords").textContent = `Koordináta: ${event.lngLat.lat.toFixed(5)}, ${event.lngLat.lng.toFixed(5)}`;
     customAddDialog.showModal();
+  });
+  map.on("click", event => {
+    if (!placingProject) return;
+    const project = placingProject;
+    if (project.custom) {
+      project.lat = event.lngLat.lat;
+      project.lng = event.lngLat.lng;
+      saveCustomProjects();
+    } else {
+      saveHandling(project.id, { overrideLat: event.lngLat.lat, overrideLng: event.lngLat.lng });
+    }
+    cancelPlacement();
+    render();
   });
   map.on("load", () => {
     mapReady = true;
@@ -1556,28 +1897,32 @@ function addMarker(project) {
   const outer = document.createElement("div");
   const decision = getDecision(project);
   const markerAlert = getMarkerAlert(project, decision);
-  outer.className = `map-marker-wrap coverage-${decision.coverage}${markerAlert.active ? " marker-alert" : markerAlert.potential ? " marker-potential" : markerAlert.unknown ? " marker-unknown" : ""}`;
-  outer.setAttribute("aria-label", `${project.title}, ${project.street}`);
-  outer.innerHTML = `<button type="button" class="map-pin pin-${project.status}"><span>${project.units || "?"}</span><span class="map-tooltip">${project.title}<br>${project.street}${markerAlert.active ? `<br><b>Piros: ${markerAlert.reasons.join("; ")}</b>` : markerAlert.potential ? `<br><b>Citromsárga: ${markerAlert.potentialReason}</b>` : markerAlert.unknown ? `<br><b>Szürke: ${markerAlert.unknownReason}</b>` : ""}</span></button>`;
+  const handling = getHandling(project);
+  const display = getEffectiveProject(project);
+  outer.className = `map-marker-wrap handling-${handling.status} coverage-${decision.coverage}${markerAlert.active ? " marker-alert" : markerAlert.potential ? " marker-potential" : markerAlert.unknown ? " marker-unknown" : ""}`;
+  outer.setAttribute("aria-label", `${display.title}, ${display.street}`);
+  outer.innerHTML = `<button type="button" class="map-pin pin-${project.status}"><span>${display.units || "?"}</span><span class="map-tooltip">${display.title}<br>${display.street}${markerAlert.active ? `<br><b>Piros: ${markerAlert.reasons.join("; ")}</b>` : markerAlert.potential ? `<br><b>Citromsárga: ${markerAlert.potentialReason}</b>` : markerAlert.unknown ? `<br><b>Szürke: ${markerAlert.unknownReason}</b>` : ""}</span></button>`;
   outer.querySelector("button").addEventListener("click", () => project.custom ? showCustomProject(project) : showProject(project));
-  const marker = new maplibregl.Marker({ element: outer, anchor: "bottom" }).setLngLat([project.lng, project.lat]).addTo(map);
+  const marker = new maplibregl.Marker({ element: outer, anchor: "bottom" }).setLngLat([display.lng, display.lat]).addTo(map);
   visibleMarkers.set(project.id, marker);
 }
 
 function showProject(project) {
   const decision = getDecision(project);
+  const handling = getHandling(project);
+  const display = getEffectiveProject(project);
   const company = getProjectCompany(project);
   const networkProximity = getNetworkProximity(decision);
   dialogContent.innerHTML = `
     <div class="dialog-hero">
       <span class="status"><i class="dot ${project.status}"></i>${project.statusLabel}</span>
-      <h2>${project.title}</h2>
-      <p>${project.street} · ${project.district}</p>
+      <h2>${escapeHTML(display.title)}</h2>
+      <p>${escapeHTML(display.street)} · ${escapeHTML(display.district)}</p>
     </div>
     <div class="dialog-body">
       <div class="detail-grid">
-        <div><span>Típus</span><strong>${project.typeLabel}</strong></div>
-        <div><span>Lakásegység</span><strong>${project.units || "nincs adat"}${project.units ? " db" : ""}</strong></div>
+        <div><span>Típus</span><strong>${escapeHTML(display.typeLabel)}</strong></div>
+        <div><span>Lakásegység</span><strong>${display.units || "nincs adat"}${display.units ? " db" : ""}</strong></div>
         <div><span>Adatminőség</span><strong>${project.confidenceLabel}</strong></div>
       </div>
       <section class="sales-sheet" aria-labelledby="sales-sheet-title">
@@ -1586,7 +1931,7 @@ function showProject(project) {
           <span class="sales-potential">${escapeHTML(getConnectionPotential(project))}</span>
         </div>
         <div class="sales-facts">
-          <div><span>Pontos cím / hely</span><strong>${escapeHTML(project.street)}</strong><small>${project.locationAccuracy === "exact" ? "Címszintű marker" : project.locationAccuracy === "city" ? "Városi közelítés" : "Utcaszintű közelítés"}</small></div>
+          <div><span>Pontos cím / hely</span><strong>${escapeHTML(display.street)}</strong><small>${project.locationAccuracy === "exact" ? "Címszintű marker" : project.locationAccuracy === "city" ? "Városi közelítés" : "Utcaszintű közelítés"}</small></div>
           <div><span>Állapot és várható ütem</span><strong>${escapeHTML(project.statusLabel)}</strong><small>${escapeHTML(project.timeline || "Külön megerősítendő")}</small></div>
           <div><span>Beruházó / kivitelező</span><strong>${escapeHTML(company?.name || "Még nincs azonosítva")}</strong><small>${escapeHTML(company?.role || "Kapcsolat felkutatása szükséges")}</small></div>
           <div><span>Hálózattól becsült távolság</span><strong>${escapeHTML(networkProximity.label)}</strong><small>${escapeHTML(COVERAGE[decision.coverage].label)} · ${escapeHTML(networkProximity.detail)}</small></div>
@@ -1636,24 +1981,91 @@ function showProject(project) {
         </div>
         <p class="coverage-evidence"><strong>Jelölés alapja:</strong> ${decision.evidence}</p>
         <a class="source-link" href="https://ekozmu.e-epites.hu/" target="_blank" rel="noopener">Cím ellenőrzése az e-közműben <span>↗</span></a>
+        <div class="handling-controls">
+          <h3>Adatok felülírása (csak ebben a böngészőben)</h3>
+          <div class="decision-grid">
+            <label>Projekt neve
+              <input type="text" id="handling-override-title" value="${escapeHTML(handling.overrideTitle || "")}" placeholder="${escapeHTML(project.title)}">
+            </label>
+            <label>Cím / helyszín
+              <input type="text" id="handling-override-street" value="${escapeHTML(handling.overrideStreet || "")}" placeholder="${escapeHTML(project.street)}">
+            </label>
+            <label>Városrész
+              <input type="text" id="handling-override-district" value="${escapeHTML(handling.overrideDistrict || "")}" placeholder="${escapeHTML(project.district)}">
+            </label>
+            <label>Típus megnevezése
+              <input type="text" id="handling-override-type" value="${escapeHTML(handling.overrideTypeLabel || "")}" placeholder="${escapeHTML(project.typeLabel)}">
+            </label>
+            <label>Lakásegység
+              <input type="number" min="0" id="handling-override-units" value="${escapeHTML(handling.overrideUnits || "")}" placeholder="${project.units || 0}">
+            </label>
+          </div>
+          <h3>Kezelési állapot és emlékeztető</h3>
+          <div class="decision-grid">
+            <label>Kezelési állapot
+              <select id="handling-status">
+                <option value="orange" ${handling.status === "orange" ? "selected" : ""}>Narancs · még nem kezelt</option>
+                <option value="green" ${handling.status === "green" ? "selected" : ""}>Zöld · foglalkoztatott</option>
+                <option value="yellow" ${handling.status === "yellow" ? "selected" : ""}>Sárga · kérdéses</option>
+                <option value="gray" ${handling.status === "gray" ? "selected" : ""}>Szürke · nem releváns</option>
+              </select>
+            </label>
+            <label>Emlékeztető dátuma
+              <input type="date" id="handling-reminder-date" value="${escapeHTML(handling.reminderDate || "")}">
+            </label>
+          </div>
+          <label style="display:block;margin-bottom:10px;font-weight:700;font-size:11px;color:var(--muted);">Emlékeztető megjegyzés
+            <textarea id="handling-reminder-note" rows="3" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;color:var(--ink);">${escapeHTML(handling.reminderNote || "")}</textarea>
+          </label>
+          <label style="display:block;margin-bottom:10px;font-weight:700;font-size:11px;color:var(--muted);">Saját megjegyzés (felülírja a "Mit tudunk?" szöveget, csak ebben a böngészőben)
+            <textarea id="handling-manual-note" rows="3" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;color:var(--ink);">${escapeHTML(handling.manualNote || "")}</textarea>
+          </label>
+          <button class="refresh-button" id="handling-save" type="button">Kezelés mentése</button>
+          <span id="handling-save-result" role="status" aria-live="polite"></span>
+        </div>
       </div>
       <h3>Mit tudunk?</h3>
-      <p>${project.summary}</p>
+      <p>${handling.manualNote ? escapeHTML(handling.manualNote) : project.summary}</p>
       <h3>Értelmezési megjegyzés</h3>
       <p>${project.note}</p>
+      ${(display.extraNotes || []).length ? `<h3>Saját jegyzetek</h3><ul class="own-notes-list">${display.extraNotes.map(note => `<li>${escapeHTML(note.text)} <small>(${escapeHTML(note.created)})</small></li>`).join("")}</ul>` : ""}
       <h3>Forrás és frissesség</h3>
       <p>Utoljára ellenőrizve: <strong>${project.checked}</strong></p>
       <a class="source-link" href="${project.source}" target="_blank" rel="noopener">Forrás megnyitása <span>↗</span></a>
       <p><small>${project.sourceName}</small></p>
+      <div class="handling-controls">
+        <h3>Marker elhelyezése</h3>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 10px;">Ha a térképi jelölés nem a pontos helyen van, ide kattintva új helyre mozgathatod a térképen.</p>
+        <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Jelenlegi koordináta: ${display.lat.toFixed(5)}, ${display.lng.toFixed(5)}</p>
+        <button class="refresh-button" id="start-placement" type="button">Marker mozgatása a térképen</button>
+      </div>
     </div>`;
   document.querySelector("#decision-relevance").addEventListener("change", event => saveDecision(project.id, { relevance: event.target.value }));
   document.querySelector("#decision-coverage").addEventListener("change", event => saveDecision(project.id, { coverage: event.target.value, evidence: "Kézzel beállított hálózati minősítés." }));
+  document.querySelector("#start-placement").addEventListener("click", () => startPlacement(project));
+  document.querySelector("#handling-save").addEventListener("click", () => {
+    saveHandling(project.id, {
+      status: document.querySelector("#handling-status").value,
+      reminderDate: document.querySelector("#handling-reminder-date").value,
+      reminderNote: document.querySelector("#handling-reminder-note").value.trim(),
+      manualNote: document.querySelector("#handling-manual-note").value.trim(),
+      overrideTitle: document.querySelector("#handling-override-title").value.trim(),
+      overrideStreet: document.querySelector("#handling-override-street").value.trim(),
+      overrideDistrict: document.querySelector("#handling-override-district").value.trim(),
+      overrideTypeLabel: document.querySelector("#handling-override-type").value.trim(),
+      overrideUnits: document.querySelector("#handling-override-units").value.trim()
+    });
+    document.querySelector("#handling-save-result").textContent = "Mentve.";
+    render();
+    checkReminders();
+  });
   dialog.showModal();
   dialog.scrollTop = 0;
   dialogContent.scrollTop = 0;
 }
 
 function showCustomProject(project) {
+  const handling = getHandling(project);
   dialogContent.innerHTML = `
     <div class="dialog-hero">
       <span class="status"><i class="dot active"></i>Saját jelölés</span>
@@ -1677,9 +2089,38 @@ function showCustomProject(project) {
           <button class="refresh-button" id="custom-delete" type="button" style="background:#C23B22;">Jelölés törlése</button>
         </div>
       </div>
+      <div class="decision-box">
+        <h3>Kezelési állapot és emlékeztető</h3>
+        <div class="decision-grid">
+          <label>Kezelési állapot
+            <select id="handling-status">
+              <option value="orange" ${handling.status === "orange" ? "selected" : ""}>Narancs · még nem kezelt</option>
+              <option value="green" ${handling.status === "green" ? "selected" : ""}>Zöld · foglalkoztatott</option>
+              <option value="yellow" ${handling.status === "yellow" ? "selected" : ""}>Sárga · kérdéses</option>
+              <option value="gray" ${handling.status === "gray" ? "selected" : ""}>Szürke · nem releváns</option>
+            </select>
+          </label>
+          <label>Emlékeztető dátuma
+            <input type="date" id="handling-reminder-date" value="${escapeHTML(handling.reminderDate || "")}">
+          </label>
+        </div>
+        <label style="display:block;margin-bottom:10px;font-weight:700;font-size:11px;color:var(--muted);">Emlékeztető megjegyzés
+          <textarea id="handling-reminder-note" rows="3" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;color:var(--ink);">${escapeHTML(handling.reminderNote || "")}</textarea>
+        </label>
+        <button class="refresh-button" id="handling-save" type="button">Kezelés mentése</button>
+        <span id="handling-save-result" role="status" aria-live="polite"></span>
+      </div>
+      ${(project.extraNotes || []).length ? `<div class="decision-box"><h3>Saját jegyzetek</h3><ul class="own-notes-list">${project.extraNotes.map(note => `<li>${escapeHTML(note.text)} <small>(${escapeHTML(note.created)})</small></li>`).join("")}</ul></div>` : ""}
+      <div class="decision-box">
+        <h3>Marker elhelyezése</h3>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 10px;">Ha a térképi jelölés nem a pontos helyen van, ide kattintva új helyre mozgathatod a térképen.</p>
+        <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Jelenlegi koordináta: ${project.lat.toFixed(5)}, ${project.lng.toFixed(5)}</p>
+        <button class="refresh-button" id="start-placement" type="button">Marker mozgatása a térképen</button>
+      </div>
       <p><small>Hozzáadva: ${escapeHTML(project.checked)} · koordináta: ${project.lat.toFixed(5)}, ${project.lng.toFixed(5)}</small></p>
       <p><small>Ez a jelölés csak ebben a böngészőben marad meg, a GitHub Pages-en élő adatokat nem módosítja.</small></p>
     </div>`;
+  document.querySelector("#start-placement").addEventListener("click", () => startPlacement(project));
   document.querySelector("#custom-save").addEventListener("click", () => {
     const newStreet = document.querySelector("#custom-edit-street").value.trim();
     const newUnits = document.querySelector("#custom-edit-units").value.trim();
@@ -1699,6 +2140,16 @@ function showCustomProject(project) {
     render();
     dialog.close();
   });
+  document.querySelector("#handling-save").addEventListener("click", () => {
+    saveHandling(project.id, {
+      status: document.querySelector("#handling-status").value,
+      reminderDate: document.querySelector("#handling-reminder-date").value,
+      reminderNote: document.querySelector("#handling-reminder-note").value.trim()
+    });
+    document.querySelector("#handling-save-result").textContent = "Mentve.";
+    render();
+    checkReminders();
+  });
   dialog.showModal();
   dialog.scrollTop = 0;
   dialogContent.scrollTop = 0;
@@ -1709,7 +2160,8 @@ function render() {
   let filtered = projects.filter(project => {
     const decision = getDecision(project);
     const markerCategory = getMarkerCategory(project, decision);
-    const haystack = normalize(`${project.title} ${project.street} ${project.district}`);
+    const display = getEffectiveProject(project);
+    const haystack = normalize(`${display.title} ${display.street} ${display.district}`);
     return (!query || haystack.includes(query)) &&
       (statusFilter.value === "all" || project.status === statusFilter.value) &&
       (typeFilter.value === "all" || project.type === typeFilter.value) &&
@@ -1749,15 +2201,17 @@ function render() {
     const relevance = RELEVANCE[decision.relevance];
     const coverage = COVERAGE[decision.coverage];
     const markerCategory = MARKER_CATEGORY[getMarkerCategory(project, decision)];
+    const handling = getHandling(project);
+    const display = getEffectiveProject(project);
     const card = document.createElement("article");
-    card.className = "project-card";
+    card.className = `project-card handling-${handling.status}`;
     card.tabIndex = 0;
     card.innerHTML = `
       <div>
-        <span class="status"><i class="dot ${project.status}"></i>${project.statusLabel}</span>
-        <h3>${project.title}</h3>
-        <p>${project.street} · ${project.district}</p>
-        <div class="project-meta"><span>${project.typeLabel}</span><span>${project.units ? `${project.units} lakásegység` : "lakásszám nem közölt"}</span><span>${project.locationAccuracy === "exact" ? "pontos cím" : project.locationAccuracy === "city" ? "közelítő hely" : "utcaszintű hely"}</span></div>
+        <span class="status"><i class="dot ${project.status}"></i>${project.statusLabel}<span class="handling-badge ${handling.status}">${HANDLING_LABEL[handling.status]}</span>${handling.reminderDate ? `<span class="reminder-badge">⏰ ${escapeHTML(handling.reminderDate)}</span>` : ""}${(display.extraNotes || []).length ? `<span class="reminder-badge">📝 ${display.extraNotes.length}</span>` : ""}</span>
+        <h3>${escapeHTML(display.title)}</h3>
+        <p>${escapeHTML(display.street)} · ${escapeHTML(display.district)}</p>
+        <div class="project-meta"><span>${escapeHTML(display.typeLabel)}</span><span>${display.units ? `${display.units} lakásegység` : "lakásszám nem közölt"}</span><span>${project.locationAccuracy === "exact" ? "pontos cím" : project.locationAccuracy === "city" ? "közelítő hely" : "utcaszintű hely"}</span></div>
         <div class="project-badges"><span class="work-badge ${markerCategory.className}">${markerCategory.label}</span><span class="work-badge ${relevance.className}">${relevance.label}</span><span class="work-badge ${coverage.className}">${coverage.label}</span></div>
       </div>
       <span class="confidence">${project.confidenceLabel}</span>`;
@@ -1771,9 +2225,10 @@ function render() {
 
   if (mapReady && filtered.length) {
     const bounds = new maplibregl.LngLatBounds();
-    filtered.forEach(project => bounds.extend([project.lng, project.lat]));
+    filtered.forEach(project => { const display = getEffectiveProject(project); bounds.extend([display.lng, display.lat]); });
     map.fitBounds(bounds, { padding: 70, maxZoom: filtered.length === 1 ? 15 : 13.8, duration: 450 });
   }
+  checkReminders();
 }
 
 [search, statusFilter, typeFilter, districtFilter, sourceFilter, confidenceFilter, giganetFilter, markerFilter, sort].forEach(element => element.addEventListener("input", render));
@@ -1797,6 +2252,13 @@ document.querySelectorAll("[data-marker-quick]").forEach(button => button.addEve
 }));
 document.querySelector(".dialog-close").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
+
+document.querySelector("#dismiss-reminders").addEventListener("click", () => document.querySelector("#reminder-banner").classList.remove("visible"));
+const enableNotificationsButton = document.querySelector("#enable-notifications");
+if (window.Notification && Notification.permission !== "granted" && Notification.permission !== "denied") {
+  enableNotificationsButton.hidden = false;
+  enableNotificationsButton.addEventListener("click", () => Notification.requestPermission().then(() => checkReminders()));
+}
 
 const networkToggle = document.querySelector("#network-layer-toggle");
 const networkOpacity = document.querySelector("#network-layer-opacity");
@@ -1850,10 +2312,12 @@ document.querySelector("#custom-add-save").addEventListener("click", () => {
     sourceName: "Saját bejegyzés (helyi böngésző)",
     sourceCategory: "community",
     checked: today,
-    custom: true
+    custom: true,
+    extraNotes: []
   };
   customProjects.push(project);
   saveCustomProjects();
+  saveHandling(project.id, { status: "green" });
   pendingCustomLngLat = null;
   customAddDialog.close();
   render();
@@ -2090,6 +2554,331 @@ refreshButton.addEventListener("click", refreshData);
 renderSources();
 renderCompanies();
 
+const HANDLING_PRIORITY = { orange: 0, green: 1, yellow: 2, gray: 3 };
+function renderAdmin() {
+  const query = normalize((document.querySelector("#admin-search")?.value || "").trim());
+  const statusFilterValue = document.querySelector("#admin-status-filter")?.value || "all";
+  const body = document.querySelector("#admin-table-body");
+  const all = [...projects, ...customProjects].filter(project => {
+    const display = getEffectiveProject(project);
+    const haystack = normalize(`${display.title} ${display.street} ${display.district}`);
+    const matchesQuery = !query || haystack.includes(query);
+    const matchesStatus = statusFilterValue === "all" || getHandling(project).status === statusFilterValue;
+    return matchesQuery && matchesStatus;
+  }).sort((a, b) => HANDLING_PRIORITY[getHandling(a).status] - HANDLING_PRIORITY[getHandling(b).status]);
+  body.innerHTML = "";
+  all.forEach(project => {
+    const handling = getHandling(project);
+    const extraNotes = project.custom ? (project.extraNotes || []) : (handling.extraNotes || []);
+    const row = document.createElement("tr");
+    row.className = project.custom ? "admin-row-custom" : "";
+    row.innerHTML = `
+      <td>
+        <strong>${escapeHTML(project.title)}</strong>
+        <small>${escapeHTML(project.street)}${project.custom ? " · saját projekt" : ""}</small>
+      </td>
+      <td><input type="text" data-field="title" value="${escapeHTML(project.custom ? project.title : (handling.overrideTitle || ""))}" placeholder="${escapeHTML(project.title)}"></td>
+      <td><input type="text" data-field="street" value="${escapeHTML(project.custom ? project.street : (handling.overrideStreet || ""))}" placeholder="${escapeHTML(project.street)}"></td>
+      <td><input type="text" data-field="district" value="${escapeHTML(project.custom ? project.district : (handling.overrideDistrict || ""))}" placeholder="${escapeHTML(project.district)}"></td>
+      <td><input type="text" data-field="typeLabel" value="${escapeHTML(project.custom ? project.typeLabel : (handling.overrideTypeLabel || ""))}" placeholder="${escapeHTML(project.typeLabel)}"></td>
+      <td><input type="number" min="0" data-field="units" value="${escapeHTML(String(project.custom ? (project.units || "") : (handling.overrideUnits || "")))}" placeholder="${project.units || 0}"></td>
+      <td>
+        <select data-field="status">
+          <option value="orange" ${handling.status === "orange" ? "selected" : ""}>Narancs · még nem kezelt</option>
+          <option value="green" ${handling.status === "green" ? "selected" : ""}>Zöld · foglalkoztatott</option>
+          <option value="yellow" ${handling.status === "yellow" ? "selected" : ""}>Sárga · kérdéses</option>
+          <option value="gray" ${handling.status === "gray" ? "selected" : ""}>Szürke · nem releváns</option>
+        </select>
+      </td>
+      <td><input type="date" data-field="reminderDate" value="${escapeHTML(handling.reminderDate || "")}"></td>
+      <td><textarea rows="2" data-field="reminderNote">${escapeHTML(handling.reminderNote || "")}</textarea></td>
+      <td><textarea rows="2" data-field="manualNote">${escapeHTML(project.custom ? (project.note || "") : (handling.manualNote || ""))}</textarea></td>
+      <td class="notes-cell">
+        <div class="notes-cell-list">
+          ${extraNotes.length ? extraNotes.map(note => `<div class="notes-cell-item"><span>${escapeHTML(note.text)}</span><button type="button" class="notes-cell-delete" data-note-id="${escapeHTML(note.id)}">×</button></div>`).join("") : `<small class="notes-cell-empty">Nincs jegyzet</small>`}
+        </div>
+        <div class="notes-cell-add">
+          <input type="text" class="notes-cell-input" placeholder="+ új jegyzet...">
+          <button type="button" class="notes-cell-add-btn">+</button>
+        </div>
+      </td>
+      <td>
+        <span class="admin-save-hint">Mentve</span>
+        ${project.custom ? `<button class="admin-delete" type="button" data-delete="${escapeHTML(project.id)}">Törlés</button>` : ""}
+      </td>`;
+    const hint = row.querySelector(".admin-save-hint");
+    const flash = () => { hint.classList.add("show"); clearTimeout(hint._t); hint._t = setTimeout(() => hint.classList.remove("show"), 1200); };
+    const saveOverride = (field, value) => {
+      if (project.custom) {
+        if (field === "units") project.units = value ? Number(value) : 0;
+        else project[field] = value;
+        saveCustomProjects();
+      } else {
+        const key = "override" + field.charAt(0).toUpperCase() + field.slice(1);
+        saveHandling(project.id, { [key]: value });
+      }
+      flash();
+      render();
+    };
+    row.querySelector('[data-field="title"]').addEventListener("change", event => saveOverride("title", event.target.value.trim()));
+    row.querySelector('[data-field="street"]').addEventListener("change", event => saveOverride("street", event.target.value.trim()));
+    row.querySelector('[data-field="district"]').addEventListener("change", event => saveOverride("district", event.target.value.trim()));
+    row.querySelector('[data-field="typeLabel"]').addEventListener("change", event => saveOverride("typeLabel", event.target.value.trim()));
+    row.querySelector('[data-field="units"]').addEventListener("change", event => saveOverride("units", event.target.value.trim()));
+    row.querySelector('[data-field="status"]').addEventListener("change", event => {
+      saveHandling(project.id, { status: event.target.value });
+      render();
+      renderAdmin();
+    });
+    row.querySelector('[data-field="reminderDate"]').addEventListener("change", event => {
+      saveHandling(project.id, { reminderDate: event.target.value });
+      flash();
+      checkReminders();
+      render();
+    });
+    row.querySelector('[data-field="reminderNote"]').addEventListener("change", event => {
+      saveHandling(project.id, { reminderNote: event.target.value.trim() });
+      flash();
+      checkReminders();
+    });
+    row.querySelector('[data-field="manualNote"]').addEventListener("change", event => {
+      const value = event.target.value.trim();
+      if (project.custom) {
+        project.note = value;
+        project.summary = value || "Nincs megjegyzés megadva.";
+        saveCustomProjects();
+      } else {
+        saveHandling(project.id, { manualNote: value });
+      }
+      flash();
+      render();
+    });
+    const addNoteFromCell = () => {
+      const input = row.querySelector(".notes-cell-input");
+      const value = input.value.trim();
+      if (!value) return;
+      addProjectNote(project, value);
+      render();
+      renderAdmin();
+    };
+    row.querySelector(".notes-cell-add-btn").addEventListener("click", addNoteFromCell);
+    row.querySelector(".notes-cell-input").addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); addNoteFromCell(); }
+    });
+    row.querySelectorAll(".notes-cell-delete").forEach(button => {
+      button.addEventListener("click", () => {
+        deleteProjectNote(project, button.dataset.noteId);
+        render();
+        renderAdmin();
+      });
+    });
+    const deleteButton = row.querySelector("[data-delete]");
+    if (deleteButton) {
+      deleteButton.addEventListener("click", () => {
+        if (!confirm(`Biztosan törlöd: ${project.title}?`)) return;
+        customProjects = customProjects.filter(item => item.id !== project.id);
+        saveCustomProjects();
+        render();
+        renderAdmin();
+      });
+    }
+    body.appendChild(row);
+  });
+}
+
+document.querySelector("#admin-add-new").addEventListener("click", () => {
+  const today = new Date().toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" });
+  const project = {
+    id: `custom-${Date.now()}`,
+    title: "Új saját projekt",
+    street: "Cím megadása",
+    district: "Saját projekt",
+    status: "active",
+    statusLabel: "Saját bejegyzés",
+    type: "custom",
+    typeLabel: "Saját projekt",
+    units: 0,
+    confidence: 1,
+    confidenceLabel: "Saját, nem ellenőrzött bejegyzés",
+    lat: 47.9495,
+    lng: 21.7244,
+    locationAccuracy: "exact",
+    summary: "Nincs megjegyzés megadva.",
+    note: "",
+    source: "",
+    sourceName: "Saját bejegyzés (helyi böngésző)",
+    sourceCategory: "community",
+    checked: today,
+    custom: true,
+    extraNotes: []
+  };
+  customProjects.push(project);
+  saveCustomProjects();
+  saveHandling(project.id, { status: "green" });
+  render();
+  renderAdmin();
+  document.querySelector("#admin-search").value = "";
+});
+
+function renderAdminCompanies() {
+  const query = normalize((document.querySelector("#admin-company-search")?.value || "").trim());
+  const body = document.querySelector("#admin-company-table-body");
+  body.innerHTML = "";
+  const catalogRows = COMPANY_CATALOG.map((company, idx) => ({ company, idx, custom: false }));
+  const customRows = customCompanies.map(company => ({ company, idx: company.id, custom: true }));
+  [...catalogRows, ...customRows].filter(({ company, idx, custom }) => {
+    const display = custom ? company : getEffectiveCompany(company, idx);
+    const haystack = normalize(`${display.name} ${display.role || ""} ${display.address || ""}`);
+    return !query || haystack.includes(query);
+  }).forEach(({ company, idx, custom }) => {
+    const override = custom ? company : (companyFlags[idx] || {});
+    const extraNotes = custom ? (company.extraNotes || []) : (override.extraNotes || []);
+    const row = document.createElement("tr");
+    row.className = custom ? "admin-row-custom" : "";
+    row.innerHTML = `
+      <td><strong>${escapeHTML(company.name)}</strong>${custom ? "<small> · saját cég</small>" : ""}</td>
+      <td><input type="text" data-field="name" value="${escapeHTML(custom ? company.name : (override.name || ""))}" placeholder="${escapeHTML(company.name)}"></td>
+      <td><input type="text" data-field="role" value="${escapeHTML(custom ? (company.role || "") : (override.role || ""))}" placeholder="${escapeHTML(company.role || "")}"></td>
+      <td><input type="text" data-field="address" value="${escapeHTML(custom ? (company.address || "") : (override.address || ""))}" placeholder="${escapeHTML(company.address || "")}"></td>
+      <td><input type="text" data-field="phone" value="${escapeHTML(custom ? (company.phone || "") : (override.phone || ""))}" placeholder="${escapeHTML(company.phone || "")}"></td>
+      <td><input type="text" data-field="email" value="${escapeHTML(custom ? (company.email || "") : (override.email || ""))}" placeholder="${escapeHTML(company.email || "")}"></td>
+      <td><input type="text" data-field="url" value="${escapeHTML(custom ? (company.url || "") : (override.url || ""))}" placeholder="${escapeHTML(company.url || "")}"></td>
+      <td class="notes-cell">
+        <div class="notes-cell-list">
+          ${extraNotes.length ? extraNotes.map(note => `<div class="notes-cell-item"><span>${escapeHTML(note.text)}</span><button type="button" class="notes-cell-delete" data-note-id="${escapeHTML(note.id)}">×</button></div>`).join("") : `<small class="notes-cell-empty">Nincs jegyzet</small>`}
+        </div>
+        <div class="notes-cell-add">
+          <input type="text" class="notes-cell-input" placeholder="+ új jegyzet...">
+          <button type="button" class="notes-cell-add-btn">+</button>
+        </div>
+      </td>
+      <td>
+        <span class="admin-save-hint">Mentve</span>
+        ${custom ? `<button class="admin-delete" type="button" data-company-delete="${escapeHTML(String(idx))}">Törlés</button>` : ""}
+      </td>`;
+    const hint = row.querySelector(".admin-save-hint");
+    const flash = () => { hint.classList.add("show"); clearTimeout(hint._t); hint._t = setTimeout(() => hint.classList.remove("show"), 1200); };
+    ["name", "role", "address", "phone", "email", "url"].forEach(field => {
+      row.querySelector(`[data-field="${field}"]`).addEventListener("change", event => {
+        const value = event.target.value.trim();
+        if (custom) {
+          company[field] = value;
+          saveCustomCompanies();
+        } else {
+          companyFlags[idx] = { ...(companyFlags[idx] || {}), [field]: value };
+          saveCompanyFlags();
+        }
+        flash();
+        renderCompanies();
+      });
+    });
+    const addNoteFromCell = () => {
+      const input = row.querySelector(".notes-cell-input");
+      const value = input.value.trim();
+      if (!value) return;
+      addCompanyNote(company, idx, custom, value);
+      renderCompanies();
+      renderAdminCompanies();
+    };
+    row.querySelector(".notes-cell-add-btn").addEventListener("click", addNoteFromCell);
+    row.querySelector(".notes-cell-input").addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); addNoteFromCell(); }
+    });
+    row.querySelectorAll(".notes-cell-delete").forEach(button => {
+      button.addEventListener("click", () => {
+        deleteCompanyNote(company, idx, custom, button.dataset.noteId);
+        renderCompanies();
+        renderAdminCompanies();
+      });
+    });
+    const deleteButton = row.querySelector("[data-company-delete]");
+    if (deleteButton) {
+      deleteButton.addEventListener("click", () => {
+        if (!confirm(`Biztosan törlöd: ${company.name}?`)) return;
+        customCompanies = customCompanies.filter(item => item.id !== company.id);
+        saveCustomCompanies();
+        renderCompanies();
+        renderAdminCompanies();
+      });
+    }
+    body.appendChild(row);
+  });
+}
+
+document.querySelector("#admin-add-company").addEventListener("click", () => {
+  customCompanies.push({ id: `company-${Date.now()}`, name: "Új saját vállalkozó", role: "", description: "Saját bejegyzés.", address: "", phone: "", email: "", url: "", custom: true, extraNotes: [] });
+  saveCustomCompanies();
+  renderCompanies();
+  renderAdminCompanies();
+  document.querySelector("#admin-company-search").value = "";
+});
+document.querySelector("#admin-company-search").addEventListener("input", renderAdminCompanies);
+
+function renderNotes() {
+  const container = document.querySelector("#admin-notes-list");
+  if (!notes.length) {
+    container.innerHTML = `<p class="empty-note-hint">Még nincs jegyzeted. Kattints a "+ Új jegyzet" gombra.</p>`;
+    return;
+  }
+  container.innerHTML = "";
+  notes.slice().reverse().forEach(note => {
+    const card = document.createElement("div");
+    card.className = "note-card";
+    card.innerHTML = `
+      <input type="text" data-field="title" value="${escapeHTML(note.title || "")}" placeholder="Jegyzet címe">
+      <textarea rows="4" data-field="body" placeholder="Írd ide a jegyzetedet...">${escapeHTML(note.body || "")}</textarea>
+      <div class="note-card-footer"><small>Utolsó mentés: ${escapeHTML(note.updated || "")}</small><button type="button" class="admin-delete" data-note-delete="${escapeHTML(note.id)}">Törlés</button></div>`;
+    const stamp = () => {
+      note.updated = new Date().toLocaleString("hu-HU");
+      saveNotes();
+      card.querySelector("small").textContent = `Utolsó mentés: ${note.updated}`;
+    };
+    card.querySelector('[data-field="title"]').addEventListener("change", event => { note.title = event.target.value.trim(); stamp(); });
+    card.querySelector('[data-field="body"]').addEventListener("change", event => { note.body = event.target.value.trim(); stamp(); });
+    card.querySelector("[data-note-delete]").addEventListener("click", () => {
+      if (!confirm("Biztosan törlöd ezt a jegyzetet?")) return;
+      notes = notes.filter(item => item.id !== note.id);
+      saveNotes();
+      renderNotes();
+    });
+    container.appendChild(card);
+  });
+}
+
+document.querySelector("#admin-add-note").addEventListener("click", () => {
+  notes.push({ id: `note-${Date.now()}`, title: "Új jegyzet", body: "", updated: new Date().toLocaleString("hu-HU") });
+  saveNotes();
+  renderNotes();
+});
+
+document.querySelectorAll(".admin-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll(".admin-panel").forEach(panel => { panel.hidden = true; });
+    document.querySelector(`#admin-panel-${tab.dataset.adminTab}`).hidden = false;
+  });
+});
+
+function showAdminView() {
+  document.querySelector("#public-view").hidden = true;
+  document.querySelector("#admin-view").hidden = false;
+  renderAdmin();
+  renderAdminCompanies();
+  renderNotes();
+}
+function hideAdminView() {
+  document.querySelector("#public-view").hidden = false;
+  document.querySelector("#admin-view").hidden = true;
+}
+function syncViewWithHash() {
+  if (location.hash === "#admin") showAdminView();
+  else hideAdminView();
+}
+window.addEventListener("hashchange", syncViewWithHash);
+document.querySelector("#admin-search").addEventListener("input", renderAdmin);
+document.querySelector("#admin-status-filter").addEventListener("change", renderAdmin);
+
 async function boot() {
   try {
     const savedOsm = JSON.parse(localStorage.getItem("nyh-epitesfigyelo-osm-projects") || "[]");
@@ -2107,6 +2896,7 @@ async function boot() {
   // dolgozik, nem a lassú, percekig tartó Overpass-lekérdezésből, megnyitáskor
   // automatikusan is lefuttatjuk - így a dátum mindig a valós állapotot mutatja.
   refreshData();
+  syncViewWithHash();
 }
 
 boot();
