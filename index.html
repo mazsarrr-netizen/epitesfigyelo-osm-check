@@ -447,6 +447,34 @@ dialog::backdrop { background: rgba(29,33,39,.72); backdrop-filter: blur(4px); }
     </div>
   </dialog>
 
+  <dialog id="custom-add-dialog">
+    <button class="dialog-close custom-add-close" type="button" aria-label="Bezárás">&times;</button>
+    <div class="dialog-hero compact">
+      <span class="status"><i class="dot active"></i>Saját jelölés</span>
+      <h2>Saját projekt felvétele</h2>
+      <p id="custom-add-coords"></p>
+    </div>
+    <div class="dialog-body">
+      <label style="display:block;margin-bottom:12px;font-weight:700;font-size:13px;">Projekt / megnevezés
+        <input type="text" id="custom-add-title" placeholder="Pl. Saját ellenőrzendő telek" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;">
+      </label>
+      <label style="display:block;margin-bottom:12px;font-weight:700;font-size:13px;">Cím / helyszín leírása
+        <input type="text" id="custom-add-street" placeholder="Pl. Kossuth utca 12." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;">
+      </label>
+      <label style="display:block;margin-bottom:12px;font-weight:700;font-size:13px;">Lakásegység (opcionális)
+        <input type="number" id="custom-add-units" min="0" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;">
+      </label>
+      <label style="display:block;margin-bottom:16px;font-weight:700;font-size:13px;">Megjegyzés
+        <textarea id="custom-add-note" rows="4" placeholder="Amit erről tudni kell..." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;resize:vertical;font-weight:400;"></textarea>
+      </label>
+      <div class="import-actions">
+        <button class="refresh-button" id="custom-add-save" type="button">Mentés</button>
+        <span id="custom-add-result" role="status" aria-live="polite"></span>
+      </div>
+      <p style="margin-top:16px;"><small>Ez a jelölés csak ebben a böngészőben, ezen a gépen marad meg.</small></p>
+    </div>
+  </dialog>
+
   <script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js" crossorigin="anonymous"></script>
   <script>
 let projects = [
@@ -1243,10 +1271,17 @@ const emptyState = document.querySelector("#empty-state");
 const dialog = document.querySelector("#project-dialog");
 const dialogContent = document.querySelector("#dialog-content");
 const coverageDialog = document.querySelector("#coverage-dialog");
+const customAddDialog = document.querySelector("#custom-add-dialog");
+let pendingCustomLngLat = null;
 
 const DECISION_KEY = "nyh-epitesfigyelo-giganet-v4-szigoru-250m";
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem(DECISION_KEY) || "{}"); } catch { decisions = {}; }
+
+const CUSTOM_KEY = "nyh-epitesfigyelo-sajat-projektek-v1";
+let customProjects = [];
+try { customProjects = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); } catch { customProjects = []; }
+function saveCustomProjects() { localStorage.setItem(CUSTOM_KEY, JSON.stringify(customProjects)); }
 
 const RELEVANCE = {
   lead: { label: "Giganet-lehetőség", className: "lead" },
@@ -1451,6 +1486,19 @@ if (window.maplibregl) {
     attributionControl: true
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+  map.dragRotate.disable();
+  map.touchZoomRotate.disableRotation();
+  map.on("contextmenu", event => {
+    event.preventDefault();
+    pendingCustomLngLat = event.lngLat;
+    document.querySelector("#custom-add-title").value = "";
+    document.querySelector("#custom-add-street").value = "";
+    document.querySelector("#custom-add-units").value = "";
+    document.querySelector("#custom-add-note").value = "";
+    document.querySelector("#custom-add-result").textContent = "";
+    document.querySelector("#custom-add-coords").textContent = `Koordináta: ${event.lngLat.lat.toFixed(5)}, ${event.lngLat.lng.toFixed(5)}`;
+    customAddDialog.showModal();
+  });
   map.on("load", () => {
     mapReady = true;
     render();
@@ -1511,7 +1559,7 @@ function addMarker(project) {
   outer.className = `map-marker-wrap coverage-${decision.coverage}${markerAlert.active ? " marker-alert" : markerAlert.potential ? " marker-potential" : markerAlert.unknown ? " marker-unknown" : ""}`;
   outer.setAttribute("aria-label", `${project.title}, ${project.street}`);
   outer.innerHTML = `<button type="button" class="map-pin pin-${project.status}"><span>${project.units || "?"}</span><span class="map-tooltip">${project.title}<br>${project.street}${markerAlert.active ? `<br><b>Piros: ${markerAlert.reasons.join("; ")}</b>` : markerAlert.potential ? `<br><b>Citromsárga: ${markerAlert.potentialReason}</b>` : markerAlert.unknown ? `<br><b>Szürke: ${markerAlert.unknownReason}</b>` : ""}</span></button>`;
-  outer.querySelector("button").addEventListener("click", () => showProject(project));
+  outer.querySelector("button").addEventListener("click", () => project.custom ? showCustomProject(project) : showProject(project));
   const marker = new maplibregl.Marker({ element: outer, anchor: "bottom" }).setLngLat([project.lng, project.lat]).addTo(map);
   visibleMarkers.set(project.id, marker);
 }
@@ -1605,6 +1653,57 @@ function showProject(project) {
   dialogContent.scrollTop = 0;
 }
 
+function showCustomProject(project) {
+  dialogContent.innerHTML = `
+    <div class="dialog-hero">
+      <span class="status"><i class="dot active"></i>Saját jelölés</span>
+      <h2>${escapeHTML(project.title)}</h2>
+      <p>${escapeHTML(project.street)}</p>
+    </div>
+    <div class="dialog-body">
+      <div class="decision-box">
+        <h3>Saját adatok szerkesztése</h3>
+        <label style="display:block;margin-bottom:12px;font-weight:700;font-size:13px;">Cím / helyszín leírása
+          <input type="text" id="custom-edit-street" value="${escapeHTML(project.street)}" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;">
+        </label>
+        <label style="display:block;margin-bottom:12px;font-weight:700;font-size:13px;">Lakásegység (opcionális)
+          <input type="number" id="custom-edit-units" min="0" value="${project.units || ""}" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;font-weight:400;">
+        </label>
+        <label style="display:block;margin-bottom:14px;font-weight:700;font-size:13px;">Megjegyzés
+          <textarea id="custom-edit-note" rows="5" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:4px;margin-top:6px;resize:vertical;font-weight:400;">${escapeHTML(project.note || "")}</textarea>
+        </label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="refresh-button" id="custom-save" type="button">Mentés</button>
+          <button class="refresh-button" id="custom-delete" type="button" style="background:#C23B22;">Jelölés törlése</button>
+        </div>
+      </div>
+      <p><small>Hozzáadva: ${escapeHTML(project.checked)} · koordináta: ${project.lat.toFixed(5)}, ${project.lng.toFixed(5)}</small></p>
+      <p><small>Ez a jelölés csak ebben a böngészőben marad meg, a GitHub Pages-en élő adatokat nem módosítja.</small></p>
+    </div>`;
+  document.querySelector("#custom-save").addEventListener("click", () => {
+    const newStreet = document.querySelector("#custom-edit-street").value.trim();
+    const newUnits = document.querySelector("#custom-edit-units").value.trim();
+    const newNote = document.querySelector("#custom-edit-note").value.trim();
+    project.street = newStreet || project.street;
+    project.units = newUnits ? Number(newUnits) : 0;
+    project.note = newNote;
+    project.summary = newNote || "Nincs megjegyzés megadva.";
+    saveCustomProjects();
+    render();
+    dialog.close();
+  });
+  document.querySelector("#custom-delete").addEventListener("click", () => {
+    if (!confirm("Biztosan törlöd ezt a saját jelölést?")) return;
+    customProjects = customProjects.filter(item => item.id !== project.id);
+    saveCustomProjects();
+    render();
+    dialog.close();
+  });
+  dialog.showModal();
+  dialog.scrollTop = 0;
+  dialogContent.scrollTop = 0;
+}
+
 function render() {
   const query = normalize(search.value.trim());
   let filtered = projects.filter(project => {
@@ -1620,6 +1719,12 @@ function render() {
       (markerFilter.value === "all" || markerCategory === markerFilter.value) &&
       (confidenceFilter.value === "all" || project.confidence >= Number(confidenceFilter.value));
   });
+
+  const customFiltered = customProjects.filter(project => {
+    const haystack = normalize(`${project.title} ${project.street} ${project.district}`);
+    return !query || haystack.includes(query);
+  });
+  filtered = [...filtered, ...customFiltered];
 
   filtered.sort((a, b) => {
     if (sort.value === "priority") {
@@ -1656,8 +1761,8 @@ function render() {
         <div class="project-badges"><span class="work-badge ${markerCategory.className}">${markerCategory.label}</span><span class="work-badge ${relevance.className}">${relevance.label}</span><span class="work-badge ${coverage.className}">${coverage.label}</span></div>
       </div>
       <span class="confidence">${project.confidenceLabel}</span>`;
-    card.addEventListener("click", () => showProject(project));
-    card.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") showProject(project); });
+    card.addEventListener("click", () => project.custom ? showCustomProject(project) : showProject(project));
+    card.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { project.custom ? showCustomProject(project) : showProject(project); } });
     card.addEventListener("mouseenter", () => visibleMarkers.get(project.id)?.getElement().querySelector(".map-pin")?.classList.add("marker-active"));
     card.addEventListener("mouseleave", () => visibleMarkers.get(project.id)?.getElement().querySelector(".map-pin")?.classList.remove("marker-active"));
     projectList.appendChild(card);
@@ -1710,6 +1815,49 @@ networkOpacity.addEventListener("input", () => {
 document.querySelector("#open-coverage-import").addEventListener("click", () => coverageDialog.showModal());
 document.querySelector(".coverage-close").addEventListener("click", () => coverageDialog.close());
 coverageDialog.addEventListener("click", event => { if (event.target === coverageDialog) coverageDialog.close(); });
+
+document.querySelector(".custom-add-close").addEventListener("click", () => customAddDialog.close());
+customAddDialog.addEventListener("click", event => { if (event.target === customAddDialog) customAddDialog.close(); });
+document.querySelector("#custom-add-save").addEventListener("click", () => {
+  if (!pendingCustomLngLat) return;
+  const title = document.querySelector("#custom-add-title").value.trim();
+  const street = document.querySelector("#custom-add-street").value.trim();
+  const unitsRaw = document.querySelector("#custom-add-units").value.trim();
+  const note = document.querySelector("#custom-add-note").value.trim();
+  if (!title) {
+    document.querySelector("#custom-add-result").textContent = "Adj meg legalább egy nevet.";
+    return;
+  }
+  const today = new Date().toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" });
+  const project = {
+    id: `custom-${Date.now()}`,
+    title,
+    street: street || "Saját jelölés (cím nincs megadva)",
+    district: "Saját projekt",
+    status: "active",
+    statusLabel: "Saját bejegyzés",
+    type: "custom",
+    typeLabel: "Saját projekt",
+    units: unitsRaw ? Number(unitsRaw) : 0,
+    confidence: 1,
+    confidenceLabel: "Saját, nem ellenőrzött bejegyzés",
+    lat: pendingCustomLngLat.lat,
+    lng: pendingCustomLngLat.lng,
+    locationAccuracy: "exact",
+    summary: note || "Nincs megjegyzés megadva.",
+    note: note || "",
+    source: "",
+    sourceName: "Saját bejegyzés (helyi böngésző)",
+    sourceCategory: "community",
+    checked: today,
+    custom: true
+  };
+  customProjects.push(project);
+  saveCustomProjects();
+  pendingCustomLngLat = null;
+  customAddDialog.close();
+  render();
+});
 document.querySelector("#apply-coverage").addEventListener("click", () => {
   const lines = document.querySelector("#coverage-input").value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   let updated = 0;
